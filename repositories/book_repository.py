@@ -18,7 +18,6 @@ class BookRepository:
 
     def save_book(self, book: Book) -> Book:
         libro = Libro(
-            id = book.uid,
             titulo = book.title,
             isbn = book.isbn,
             descripcion = book.description,
