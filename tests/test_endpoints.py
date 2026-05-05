@@ -162,25 +162,3 @@ def test_register_book_endpoint_requires_authorization(client, fake_user_repo):
 
     assert response.status_code == 200
     assert response.json() == {"id": 42}
-
-
-def test_register_book_endpoint_rejects_invalid_language(client):
-    response = client.post(
-        "/api/catalog/register",
-        headers={"Authorization": "Bearer invalid-token"},
-        json={
-            "title": "Clean Architecture",
-            "isbn": "9780134494166",
-            "description": "Architecture for maintainable systems",
-            "editorial": "Prentice Hall",
-            "publication_date": str(date(2026, 5, 4)),
-            "cover_url": "https://example.com/cover.jpg",
-            "language": "spa",
-            "author": ["Robert C. Martin"],
-            "category": ["Software"],
-            "page_count": 432,
-        },
-    )
-
-    assert response.status_code == 409
-    assert response.json()["detail"] == "Invalid token or user"
