@@ -1,10 +1,15 @@
+from __future__ import annotations
 from datetime import date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Table, Text, Column, ForeignKey
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from db.base import Base, BaseModel
 from db.models.autor import Autor
 from db.models.genero import Genero
+from db.models.ejemplar import Ejemplar
+
+if TYPE_CHECKING:
+    from db.models.ejemplar import Ejemplar
 
 libro_autores = Table("libro_autores", Base.metadata,
     Column("libro_id", ForeignKey("libros.id"), primary_key=True),
@@ -45,3 +50,4 @@ class Libro(BaseModel):
 
     autores: Mapped[list[Autor]] = relationship(secondary=libro_autores)
     generos: Mapped[list[Genero]] = relationship(secondary=libro_generos)
+    ejemplares: Mapped[list["Ejemplar"]] = relationship(back_populates="libro")

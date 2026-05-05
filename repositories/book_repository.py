@@ -5,21 +5,55 @@ from db.models.genero import Genero
 from db.models.libro import Libro
 from domain.book import Book
 from datetime import date
+from typing import Optional
 
 class BookRepository:
 
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    # TODO: Mejorar el retorno de libros con filtros y búsqueda
-    def get_books(self) -> list[Book]:
-        libros = list(self.db.execute(select(Libro)).scalars().all())
+    def get_books(
+        self,
+        title: Optional[str] = None,
+        author: Optional[str] = None,
+        genre: Optional[str] = None,
+        language: Optional[str] = None,
+        from_date: Optional[date] = None,
+        to_date: Optional[date] = None,
+        limit: int = 20,
+        offset: int = 0
+    ) -> list[Book]:
+        query = select(Libro)
+
+        if title:
+            query = query.where(Libro.titulo.ilike(f"%{title}%"))
+
+        if language:
+            query = query.where(Libro.lenguaje == language)
+
+        if author:
+            query = query.join(Libro.autores).where(
+                Autor.nombre.ilike(f"%{author}%")
+            )
+
+        if genre:
+            query = query.join(Libro.generos).where(
+                Genero.nombre.ilike(f"%{genre}%")
+            )
+
+        if from_date:
+            query = query.where(from_date <= Libro.fecha_publicacion)
+
+        if to_date:
+            query = query.where(Libro.fecha_publicacion <= to_date)
+
+        query = query.distinct().offset(offset).limit(limit)
+        libros = list(self.db.execute(query).scalars().all())
         return [self._to_domain(libro) for libro in libros]
 
     def save_book(self, book: Book) -> Book:
         self._validate_book(book)
         libro = Libro(
-            id = book.uid,
             titulo = book.title,
             isbn = book.isbn,
             descripcion = book.description,
@@ -85,5 +119,4 @@ class BookRepository:
             author = [autor.nombre for autor in libro.autores],
             category = [genero.nombre for genero in libro.generos],
             page_count = libro.num_paginas if libro.num_paginas else -1,
-            n_copies = 1, # TODO: Crear tablas y asignaciones para más libros
         )
