@@ -9,13 +9,18 @@ from domain.book import Book
 router = APIRouter(prefix="/books",tags=["books"])
 
 @router.get("/")
-async def getBooks(params : SearchBookDto, bookService : BookService = Depends(get_book_service) ):
-    result : list[Book] = await bookService.getBooks(params)
+async def getBooks(title:str | None = None,author:str | None= None,limit:int | None= None,offset:int | None= None, bookService : BookService = Depends(get_book_service) ):
+    result : list[Book] = await bookService.getBooks(SearchBookDto(
+        title=title,
+        author=author,
+        limit=limit,
+        offset=offset
+    ))
     has_next = False
     next_cursor = None
-    if params.limit is not None and len(result) > params.limit:
+    if limit is not None and len(result) > limit:
         has_next = True
-        next_cursor = params.limit + params.offset if params.offset is not None else params.limit  
+        next_cursor = limit + offset if offset is not None else limit  
     return {
         "data" : result,
         "page" : {

@@ -45,4 +45,4 @@ class BookService:
             page_count=book.page_count
         )
         saved = self.repo.save_book(toCreate)
-        return saved.uid
+        return saved.id

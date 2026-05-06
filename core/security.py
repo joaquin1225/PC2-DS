@@ -6,7 +6,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from repositories.user_repository import UserRepository
 from repositories.exports.di import get_user_repository
 
-SECRET_KEY = "This is a secret key. Do not share with anyone under any"
+SECRET_KEY = "This is a secret key. Do not share with anyone under any circumstances"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -65,7 +65,7 @@ async def extract_user(
         print("inside guard")
         payload = jwt.decode(credentials.credentials,SECRET_KEY,algorithms=[ALGORITHM])
         print(payload)
-        user  = await user_repo.findUserById(str(payload['sub']))
+        user  = user_repo.getUserCredentials(str(payload['sub']))
         print(user)
         if user is None:
             raise ValueError
