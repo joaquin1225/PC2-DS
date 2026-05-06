@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
-from api.core.security import extract_user
+from core.security import extract_user
 from api.dtos.book_dto import RegisterBookDto
-from api.services.book_service import BookService
-from api.services.exports.di import get_book_service
+from services.book_service import BookService
+from services.exports.di import get_book_service
 from domain.user import User
 
 router = APIRouter(prefix="/catalog", tags=["catalog"])

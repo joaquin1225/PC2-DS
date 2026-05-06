@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
-from api.services.exports.di import get_book_service 
-from api.services.book_service import BookService
+from services.exports.di import get_book_service 
+from services.book_service import BookService
 from api.dtos.book_dto import SearchBookDto
 from domain.user import User
 from domain.book import Book

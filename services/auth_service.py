@@ -1,5 +1,7 @@
-from api.core.security import verify_password, generate_token, hash_password
+from core.security import verify_password, generate_token, hash_password
 from api.dtos.login_dto import RegisterUserDto
+from domain import user
+from domain.user import User, UserCredentials
 from repositories.user_repository import UserRepository
 
 class AuthService:
@@ -25,7 +27,16 @@ class AuthService:
     async def registerUser(self, userDto : RegisterUserDto):
         userDto.password = hash_password(password=userDto.password)
         try:
-            await self.user_repo.saveUser(userDto)
+            await self.user_repo.saveUser(User(
+                uid=userDto.uid,
+                full_name=userDto.fullname,
+                email=userDto.email,
+                contact_number=userDto.contact_number,
+                role="user",
+                credentials=UserCredentials(
+                    password_hash=userDto.password
+                )
+            ))
             return True
         except Exception as e:
             return False
