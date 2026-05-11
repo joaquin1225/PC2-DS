@@ -53,7 +53,6 @@ def validate_isbn(isbn : str):
             .upper()
     )
     try:
-        print(normalized)
         match len(normalized):
             case 10:
                 total = 0
@@ -106,4 +105,3 @@ IsbnString = Annotated[
     ),
     AfterValidator(validate_isbn)
 ]
-
