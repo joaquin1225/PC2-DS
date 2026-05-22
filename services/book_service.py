@@ -3,6 +3,7 @@ from api.dtos.book_dto import RegisterBookDto, SearchBookDto
 from repositories.book_repository import BookRepository
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from core.exceptions import BookNotCreatedException
+from domain.builders.book_builder import BookBuilder
 
 class BookService:
     def __init__(self, book_repo : BookRepository) -> None:
@@ -33,18 +34,20 @@ class BookService:
         return data
 
     async def registerBook(self, book : RegisterBookDto) -> int | None:
-        toCreate = Book(
-            id=0,
-            title=book.title,
-            isbn=book.isbn,
-            description=book.isbn,
-            editorial=book.editorial,
-            publication_date=book.publication_date,
-            cover_url=book.cover_url.encoded_string(),
-            language=book.language,
-            author=book.author,
-            category=book.category,
-            page_count=book.page_count
+        toCreate = (
+            BookBuilder()
+            .id(0)
+            .title(book.title)
+            .isbn(book.isbn)
+            .description(book.description)
+            .editorial(book.editorial)
+            .publication_date(book.publication_date)
+            .cover_url(book.cover_url.encoded_string())
+            .language(book.language)
+            .author(book.author)
+            .category(book.category)
+            .page_count(book.page_count)
+            .build()
         )
         try:
             saved = self.repo.save_book(toCreate)
