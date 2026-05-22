@@ -1,12 +1,26 @@
 from domain.book import Book
+from domain.user import User
 from api.dtos.book_dto import RegisterBookDto, SearchBookDto
+from api.dtos.loan_dto import LoanDto
 from repositories.book_repository import BookRepository
+from repositories.loan_repository import LoanRepository, Loan
+from repositories.book_copy_repository import BookCopyRepository
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+
 from core.exceptions import BookNotCreatedException
 
+from datetime import datetime, timezone
+
 class BookService:
-    def __init__(self, book_repo : BookRepository) -> None:
+    def __init__(
+            self, 
+            book_repo : BookRepository,
+            loan_repo : LoanRepository,
+            book_copy_repo : BookCopyRepository
+        ) -> None:
         self.repo = book_repo
+        self.loan_repo = loan_repo
+        self.book_copy_repo = book_copy_repo
 
     async def getBooks(self,params : SearchBookDto) -> list[Book] :
         data = []
@@ -54,6 +68,17 @@ class BookService:
         except SQLAlchemyError:
             raise BookNotCreatedException("Unknown exception")
         
-    async def borrowBook(self,id : int):
-        #La base de datos aún no tiene soporte para esto creo
-        pass
+    async def borrowBook(self,loanDto:LoanDto, user : User):
+        
+        try:
+            book_list = self.book_copy_repo.get_copies(loanDto.book_id)
+            if(len(book_list) == 0): raise NoBooksAvailableException
+            #Elegir la primera copia como la elegida
+            
+        
+        except Exception as e:
+            raise e
+
+
+class IllegalBookId(Exception): pass
+class NoBooksAvailableException(Exception) : pass

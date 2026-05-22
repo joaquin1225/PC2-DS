@@ -3,6 +3,7 @@ from services.exports.di import get_book_service
 from core.security import extract_user 
 from services.book_service import BookService
 from api.dtos.book_dto import SearchBookDto, RegisterBookDto
+from api.dtos.loan_dto import LoanDto
 from domain.user import User
 from domain.book import Book
 from core.exceptions import BookNotCreatedException
@@ -49,9 +50,9 @@ async def registerBook(info : RegisterBookDto, user : User = Depends(extract_use
     }
 
 @router.post("/borrow/{id}")
-async def borrowBook(id : PositiveInt, user : User = Depends(extract_user), bookService : BookService = Depends(get_book_service)):
+async def borrowBook(loanDto : LoanDto, user : User = Depends(extract_user), bookService : BookService = Depends(get_book_service)):
     try:
-        book_id = await bookService.borrowBook(id)
+        book_id = await bookService.borrowBook(loanDto, user)
         return {
             "id" : book_id
         }
